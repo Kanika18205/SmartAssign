@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: '/api' });
+// Use deployed backend in production, local in development
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+
+const api = axios.create({ baseURL: BASE_URL });
 
 api.interceptors.request.use(cfg => {
   const token = localStorage.getItem('token');
@@ -24,8 +27,6 @@ export const resendOTP      = (data) => api.post('/auth/resend-otp', data);
 export const forgotPassword = (data) => api.post('/auth/forgot-password', data);
 export const resetPassword  = (token, data) => api.post(`/auth/reset-password/${token}`, data);
 export const getMe          = () => api.get('/auth/me');
-
-// aliases
 export const forgotPW = forgotPassword;
 export const resetPW  = resetPassword;
 
@@ -49,8 +50,9 @@ export const deleteTest    = (id)   => api.delete(`/teacher/test/${id}`);
 export const publishTest   = (id)   => api.post(`/teacher/test/${id}/publish`);
 export const getResults    = (id)   => api.get(`/teacher/test/${id}/results`);
 export const getMLInsights = (id)   => api.get(`/teacher/test/${id}/ml-insights`);
+export const getTestResults = getResults;
 export const exportResults  = async (id, title) => {
-  const res = await axios.get(`/api/teacher/test/${id}/export`, {
+  const res = await axios.get(`${BASE_URL}/teacher/test/${id}/export`, {
     responseType: 'blob',
     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
   });
@@ -60,9 +62,6 @@ export const exportResults  = async (id, title) => {
   URL.revokeObjectURL(url);
 };
 
-// aliases used by older pages
-export const getTestResults  = getResults;
-
 // ── Student ───────────────────────────────────────────────────
 export const getAvailableTests  = ()      => api.get('/student/tests');
 export const startTest          = (id)    => api.post(`/student/test/${id}/start`);
@@ -70,6 +69,4 @@ export const submitTest         = (id, d) => api.post(`/student/test/${id}/submi
 export const getMyResults       = ()      => api.get('/student/results');
 export const getAttemptDetail   = (id)    => api.get(`/student/result/${id}`);
 export const getPerformance     = ()      => api.get('/student/performance');
-
-// aliases
-export const getStudentResults = getMyResults;
+export const getStudentResults  = getMyResults;
