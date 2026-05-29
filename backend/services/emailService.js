@@ -4,8 +4,16 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // Gmail App Password
+    pass: process.env.EMAIL_PASS,
   },
+});
+
+transporter.verify((err, success) => {
+  if (err) {
+    console.error('SMTP ERROR:', err);
+  } else {
+    console.log('SMTP READY');
+  }
 });
 
 const logo = `<div style="font-family:'Segoe UI',sans-serif;background:#080b10;color:#e6edf3;padding:32px;border-radius:12px;border:1px solid #21262d;">
