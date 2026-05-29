@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Use deployed backend in production, local in development
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+const BASE_URL = 'https://smartassign-backend.onrender.com/api' || 'http://localhost:5001/api';
 
 const api = axios.create({ baseURL: BASE_URL });
 
