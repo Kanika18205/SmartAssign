@@ -13,7 +13,7 @@ require('./models/Class');
 require('./models/Test');
 require('./models/Attempt');
 
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
+app.use(cors({ origin: ['https://smart-assign-mu.vercel.app' || 'http://localhost:5173'], credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
