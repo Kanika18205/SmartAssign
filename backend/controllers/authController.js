@@ -30,14 +30,20 @@ exports.register = async (req, res) => {
       if (existing) {
         if (!existing.isVerified) {
           const otp = generateOTP(); existing.otp = otp; existing.otpExpiry = new Date(Date.now() + 10*60*1000); await existing.save();
-          try { await emailService.sendOTP(email, name, otp); } catch(e) { console.log('Teacher OTP (email failed):', otp); }
+          emailService.sendOTP(email, name, otp)
+  .then(() => console.log('OTP sent'))
+  .catch(err => console.error('OTP email failed:', err.message));
+          
           return res.status(200).json({ message: 'OTP resent to your email.' });
         }
         return res.status(400).json({ message: 'Email already registered. Please login.' });
       }
       const otp = generateOTP(); console.log('Teacher OTP:', otp);
       await User.create({ name: name.trim(), email: email.trim().toLowerCase(), password, role: 'teacher', otp, otpExpiry: new Date(Date.now() + 10*60*1000), isVerified: false });
-      try { await emailService.sendOTP(email, name, otp); } catch(e) { console.log('OTP email failed, OTP:', otp); }
+      
+      emailService.sendOTP(email, name, otp)
+  .catch(err => console.error('Teacher OTP email failed:', err.message));
+      
       return res.status(201).json({ message: 'OTP sent to your email. Please verify to complete registration.' });
     }
   } catch (err) { console.error('REGISTER ERROR:', err.message); res.status(500).json({ message: err.message }); }
@@ -64,7 +70,12 @@ exports.resendOTP = async (req, res) => {
     if (user.isVerified) return res.status(400).json({ message: 'Already verified' });
     const otp = generateOTP(); user.otp = otp; user.otpExpiry = new Date(Date.now() + 10*60*1000); await user.save();
     console.log('Resend OTP:', otp);
-    try { await emailService.sendOTP(email, user.name, otp); } catch(e) { console.log('OTP email failed, OTP:', otp); }
+    res.json({ message: 'New OTP sent' });
+
+emailService.sendOTP(email, user.name, otp)
+  .then(() => console.log('Resend OTP sent'))
+  .catch(err => console.error('Resend OTP failed:', err.message));
+    
     res.json({ message: 'New OTP sent' });
   } catch (err) { console.error('RESEND OTP ERROR:', err.message); res.status(500).json({ message: err.message }); }
 };
